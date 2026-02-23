@@ -116,14 +116,32 @@ def download_one(url, index, total):
 
     # 🔐 NO FFMPEG REQUIRED FORMAT
     ydl_opts = {
-        "outtmpl": f"{folder}/%(title)s.%(ext)s",
-        "format": "best[ext=mp4]/best",
-        "noplaylist": not is_playlist,
-        "progress_hooks": [hook],
-        "quiet": True,
-        "no_warnings": True,
-        "retries": 5,
-    }
+    "outtmpl": f"{folder}/%(title)s.%(ext)s",
+
+    # Better format fallback
+    "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+
+    # Playlist control
+    "noplaylist": not is_playlist,
+
+    # Retry system
+    "retries": 10,
+    "fragment_retries": 10,
+
+    # Anti-403 tricks
+    "geo_bypass": True,
+    "nocheckcertificate": True,
+
+    "http_headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.google.com/",
+    },
+
+    "progress_hooks": [hook],
+    "quiet": True,
+    "no_warnings": True,
+}
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -167,3 +185,4 @@ st.text_area(
 )
 
 st.caption("made with 🐾 love")
+
